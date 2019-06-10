@@ -1,12 +1,11 @@
 const express = require('express');
 const User = require('../models/models');
 const bodyParser = require('body-parser');
-const app = express();
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
-
+const parser = bodyParser.json();
 const router = express.Router();
+
+router.use(parser);
 
 router.get('/', (req, res) => {
     try{
@@ -34,38 +33,22 @@ router.get('/:id', (req, res) => {
 
 router.put('/:id', (req, res) => {
     try{
-        User.save(req.user);
-        res.json(req.user);
-    }
-    catch{
-        res.status(500).send(err);
-    }
-
-});
-
-router.patch('/:id', (req, res) => {
-    try{
-        User.findById(req.params.id, (err, user) => {
-            if(req.body.id){
-                delete req.body.id;
-            }
-            for(let b in req.body){
-                user[b] = req.body[b];
-            }
-            user.save();
-            res.json(user);
+        //var user = User.findById(req.params.id);
+        User.findByIdAndUpdate(req.params.id, req.body, {new: true}, function(err, user){ 
+            res.status(200).send(user);
         });
+       
     }
-    catch{
+    catch(err){
         res.status(500).send(err);
     }
- 
+
 });
-//delete works, but the success response never comes
+
 router.delete('/:id', (req, res) => {
     try{
         User.findByIdAndRemove(req.params.id, (err, user) => {
-            res.send.status(200);
+            res.status(200).send("success");
         });
     }
     catch{
@@ -76,14 +59,17 @@ router.delete('/:id', (req, res) => {
 
 router.post('/addUser', (req, res) => {
     try{
-        const newUser = new User();
-        newUser.userName = req.body.userName;
-        newUser.passWord = req.body.passWord;
-        User.save(newUser);
+        console.log(req.body);
+        let newUser = new User({
+            userName: req.body.userName,
+            passWord: req.body.passWord
+        });
+        newUser.save();
         res.status(201).send(newUser);
-    }
-    catch{
-        res.status(500).send();
+    } 
+    catch(err){
+      //  res.status(500).send(err);
+        console.log(err);
     }
   
 });
