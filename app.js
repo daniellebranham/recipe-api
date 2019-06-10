@@ -1,10 +1,10 @@
 const express = require('express');
 const mongoose = require('mongoose');
-
 const router = require('./router/routes');
+
 const app = express();
 
-mongoose.connect('mongodb://localhost:27017/Users', {useNewUrlParser: true});
+mongoose.connect('mongodb://localhost:27017/Users', { useNewUrlParser: true });
 
 app.use('/api/users', router);
 
