@@ -15,6 +15,8 @@
     "rules": {
         "quotes": [2, "single", { "avoidEscape": true }],
         "prefer-destructuring": 0,
-        "indent": "off"
+        "indent": "off",
+        "no-unused-vars": "off",
+        "comma-dangle": "off"
     }
 }

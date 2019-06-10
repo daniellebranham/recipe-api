@@ -1,66 +1,56 @@
-const express = require("express");
-const bodyParser = require("body-parser");
-const User = require("../models/models");
+const express = require('express');
+const bodyParser = require('body-parser');
+const User = require('../models/models');
 
 const parser = bodyParser.json();
 const router = express.Router();
 
 router.use(parser);
 
-router.get("/", (req, res) => {
-  try {
+router.get('/', (req, res) => {
     User.find({}, (err, users) => {
-      res.json(users);
+        if (err) return res.json({ success: false, error: err });
+        return res.json({ success: true, data: users });
     });
-  } catch (err) {
-    res.status(500).send(err);
-  }
 });
 
-router.get("/:id", (req, res) => {
-  try {
+router.get('/:id', (req, res) => {
     User.findById(req.params.id, (err, user) => {
-      res.json(user);
+        if (err) return res.json({ success: false, error: err });
+        return res.json({ success: true, data: user });
     });
-  } catch (err) {
-    res.status(500).send(err);
-  }
 });
 
-router.put("/:id", (req, res) => {
-  try {
-    User.findByIdAndUpdate(req.params.id, req.body, { new: true }, function(
-      err,
-      user
-    ) {
-      res.status(200).send(user);
-    });
-  } catch (err) {
-    res.status(500).send(err);
-  }
+router.put('/:id', (req, res) => {
+    User.findByIdAndUpdate(
+        req.params.id,
+        req.body,
+        { new: true },
+        (err, user) => {
+            if (err) return res.json({ success: false, error: err });
+            return res.json({ success: true, data: user });
+        }
+    );
 });
 
-router.delete("/:id", (req, res) => {
-  try {
+router.delete('/:id', (req, res) => {
     User.findByIdAndRemove(req.params.id, (err, user) => {
-      res.status(200).send("success");
+        if (err) return res.json({ success: false, error: err });
+        return res.json({ success: true });
     });
-  } catch (err) {
-    res.status(500).send(err);
-  }
 });
 
-router.post("/addUser", (req, res) => {
-  try {
-    const newUser = new User({
-      userName: req.body.userName,
-      passWord: req.body.passWord
-    });
-    newUser.save();
-    res.status(201).send(newUser);
-  } catch (err) {
-    res.status(500).send(err);
-  }
+router.post('/addUser', (req, res) => {
+    try {
+        const newUser = new User({
+            userName: req.body.userName,
+            passWord: req.body.passWord,
+        });
+        newUser.save();
+        res.json({ success: true, data: newUser });
+    } catch (err) {
+        res.json({ success: false, error: err });
+    }
 });
 
 module.exports = router;
