@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
-const ObjectId = Schema.ObjectId;
 
 const user = new Schema({
     Username: String,
@@ -10,4 +9,5 @@ const user = new Schema({
     Inventory: [{ Name: String, Quantity: Number }],
 });
 
-module.exports = mongoose.model('Users', user);
+const User = mongoose.model('User', user);
+module.exports = User;

@@ -14,16 +14,16 @@ router.get('/', (req, res) => {
     });
 });
 
-router.get('/:id', (req, res) => {
-    User.findById(req.params.id, (err, user) => {
+router.get('/findUser', (req, res) => {
+    User.findById(req.body.id, (err, user) => {
         if (err) return res.json({ success: false, error: err });
         return res.json({ success: true, data: user });
     });
 });
 
-router.put('/:id', (req, res) => {
+router.put('/updateUser', (req, res) => {
     User.findByIdAndUpdate(
-        req.params.id,
+        req.body.id,
         req.body,
         { new: true },
         (err, user) => {
@@ -33,8 +33,8 @@ router.put('/:id', (req, res) => {
     );
 });
 
-router.delete('/:id', (req, res) => {
-    User.findByIdAndRemove(req.params.id, (err, user) => {
+router.delete('/deleteUser', (req, res) => {
+    User.findByIdAndRemove(req.body.id, (err, user) => {
         if (err) return res.json({ success: false, error: err });
         return res.json({ success: true });
     });
@@ -42,8 +42,8 @@ router.delete('/:id', (req, res) => {
 
 router.post('/addUser', (req, res) => {
     try {
-        User.find({ Username: req.body.Username }, (err, user) => {
-            if (user.length) {
+        User.findOne({ Username: req.body.Username }, (err, user) => {
+            if (user) {
                 return res.json({
                     success: false,
                     data: 'Username already exists.',
@@ -59,27 +59,22 @@ router.post('/addUser', (req, res) => {
     }
 });
 
-router.get('/getInventory/:Username', (req, res) => {
-    User.find(
-        { Username: req.params.Username },
-        { Inventory: 1 },
-        (err, user) => {
-            if (err) return res.json({ success: false, error: err });
-            return res.json({ success: true, data: user });
+//add login method
+router.post('/login', (req, res) => {
+    console.log(req.body);
+    User.findOne({ Username: req.body.Username }, (err, userFound) => {
+        if (!userFound) {
+            return res.json({ success: false, data: 'Username not found' });
         }
-    );
-});
-//think about how to save inventory. lots of updates or just resave all inventory?
-router.put('/saveInventory/:id', (req, res) => {
-    User.findByIdAndUpdate(
-        { Inventory: req.params.id },
-        { Inventory: req.body },
-        { new: true },
-        (err, inventory) => {
-            if (err) return res.json({ success: false, error: err });
-            return res.json({ success: true, data: inventory });
+        if (err) return res.json({ succes: false, data: err });
+
+        const user = userFound;
+        if (user.Password !== req.body.Password) {
+            return res.json({ success: false, data: 'Invalid Password' });
         }
-    );
+
+        return res.json({ success: true });
+    });
 });
 
 module.exports = router;
